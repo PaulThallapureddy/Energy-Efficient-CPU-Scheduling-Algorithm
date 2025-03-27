@@ -54,3 +54,23 @@ void execute_task(CpuState* cpu, Task* task) {
     double execution_time = task->workload * (3000.0 / cpu->frequency);
     sleep(execution_time);
 }
+int main() {
+    srand(time(NULL));
+    CpuState cpu;
+    initialize_cpu(&cpu);
+    
+    Task tasks[5];
+    for (int i = 0; i < 5; i++) {
+        tasks[i].task_id = i + 1;
+        tasks[i].workload = 0.2 + (double)rand() / RAND_MAX * 0.8;
+        tasks[i].priority = rand() % 3 + 1;
+    }
+    
+    for (int i = 0; i < 5; i++) {
+        adjust_power_mode(&cpu, &tasks[i]);
+        execute_task(&cpu, &tasks[i]);
+    }
+    
+    printf("All tasks completed. Returning to POWERSAVE mode.\n");
+    return 0;
+}
