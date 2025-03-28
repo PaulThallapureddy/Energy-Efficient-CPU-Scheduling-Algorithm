@@ -37,3 +37,43 @@ SystemMetrics generate_metrics() {
     metrics.power = 5.0 + metrics.cpu_usage * 0.15;
     return metrics;
 }
+void display_metrics(SystemMetrics metrics) {
+    erase();
+    
+    mvprintw(1, 1, "SYSTEM MONITOR DASHBOARD");
+    mvprintw(3, 1, "CPU Usage:    %.1f%%", metrics.cpu_usage);
+    mvprintw(4, 1, "Frequency:    %.0f MHz", metrics.frequency);
+    mvprintw(5, 1, "Temperature:  %.1f°C", metrics.temperature);
+    mvprintw(6, 1, "Power Draw:   %.2f W", metrics.power);
+    
+    mvprintw(8, 1, "Performance State:");
+    if (metrics.frequency > 2500.0) {
+        attron(COLOR_PAIR(1));
+        mvprintw(9, 1, "HIGH PERFORMANCE");
+        attroff(COLOR_PAIR(1));
+    } else if (metrics.frequency > 1800.0) {
+        attron(COLOR_PAIR(3));
+        mvprintw(9, 1, "BALANCED");
+        attroff(COLOR_PAIR(3));
+    } else {
+        attron(COLOR_PAIR(2));
+        mvprintw(9, 1, "POWER SAVING");
+        attroff(COLOR_PAIR(2));
+    }
+    
+    refresh();
+}
+
+int main() {
+    srand(time(NULL));
+    initialize_ncurses();
+    
+    while (1) {
+        SystemMetrics metrics = generate_metrics();
+        display_metrics(metrics);
+        usleep(500000); // Update twice per second
+    }
+    
+    endwin();
+    return 0;
+}
